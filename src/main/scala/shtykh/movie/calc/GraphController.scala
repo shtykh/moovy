@@ -16,16 +16,17 @@ class GraphController extends Actor with ActorLogging {
   val graph = Graph[Int, UnDiEdge]()
 
   override def receive = {
-    case m @ AddRelations(id, relations, responder) =>
+    case AddRelations(id, relations, responder) =>
       responder ! addRelations(id, relations)
-    case m @ DistancesRequest(id, receiver) =>
+    case DistancesRequest(id, receiver) =>
       sender ! Distances(id, countDistances(id), receiver)
-    case m @ NeighborRequest(movie, receiver) =>
+    case MovieMessage(movie, receiver) =>
       receiver ! MovieProfile(movie, getNeighbors(movie.id))
-    case m @ _ => sender ! NotImplementedMessage("graph", m)
+    case m => sender ! NotImplementedMessage("graph", m)
   }
-
-  def countDistances(id: Int): List[(Int, Int)] = List.empty // TODO emplement it!
+  def countDistances(id: Int): List[(Int, Int)] = {
+    getNeighbors(id).map((_, 1)).toList // TODO implement dijkstra
+  }
   def addRelations(id: Int, set: Set[Int]) = {
     set.foreach(uuid => graph += (id ~ uuid))
     s"$id set to be related to $set"

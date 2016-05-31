@@ -36,7 +36,7 @@ trait MovieApi extends HttpService {
       path("movie" / IntNumber) {
         id => {
           get { requestContext =>
-            router ! Get(id, responder(requestContext))
+            router ! GetProfile(id, responder(requestContext))
           }
       }
   }
@@ -84,7 +84,7 @@ trait MovieApi extends HttpService {
     nickname = "relevant",
     httpMethod = "GET",
     produces = "application/json",
-    response = classOf[List[Movie]])
+    response = classOf[List[MovieRelevancy]])
   @ApiImplicitParams(Array(
     new ApiImplicitParam(
       name = "movieId",

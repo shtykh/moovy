@@ -1,6 +1,6 @@
 package shtykh.movie.calc
 
-import akka.actor.{Actor, ActorLogging, Props}
+import akka.actor.{ActorRef, Actor, ActorLogging, Props}
 import shtykh.movie._
 
 /**
@@ -8,13 +8,13 @@ import shtykh.movie._
  */
 class MessageRouter extends Actor with ActorLogging {
   val graph = context.actorOf(Props[GraphController], name="graph")
-  val store = context.actorOf(Props[StoreController], name="store")
+  val store = context.actorOf(Props(new StoreController(graph)), name="store")
 
   override def receive: Receive = {
     case m @ Add(movie, responder) =>
       log.debug(s"adding movie $movie")
       store ! m
-    case m @ Get(id, responder) =>
+    case m @ GetProfile(id, responder) =>
       log.debug(s"getting movie by $id")
       store ! m
     case m @ GetAll(responder) =>
@@ -25,15 +25,12 @@ class MessageRouter extends Actor with ActorLogging {
       graph ! m
     case m @ GetRelevant(id, amount, responder) =>
       log.debug(s"getting relevant by $id")
-      relevanceActor(id, amount) ! m
-    case m @ NeighborRequest(movie, responder) =>
-      log.debug(s"getting neighbors for $movie")
-      graph ! m
-    case m: MovieMessage =>
-      m.responder ! "Go fuck yourself"
+      relevanceActor(amount, responder) ! m
+    case m: BaseMovieMessage =>
+      m.receiver ! "Go fuck yourself"
   }
   
-  private def relevanceActor(id: Int, amount: Int) = {
-    context.actorOf(Props(new RelevantMovieFinder(id, amount, graph, store)))
+  private def relevanceActor(amount: Int, responder: ActorRef) = {
+    context.actorOf(Props(new RelevantMovieFinder(amount, graph, store, responder)))
   }
 }
