@@ -23,7 +23,7 @@ class RelevantMovieFinder(amount: Int, graph: ActorRef, store: ActorRef, respond
     case Distances(id, distances, responder) =>
       size = distances.size
       if (size == 0) responder ! 
-        Set.empty 
+        List.empty
       else distances.foreach{
         case (movieId, distance) => workerRouter ! CalculateRelevancy(movieId, distance, self)
       }
