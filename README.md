@@ -14,5 +14,5 @@ Name | Comment | Method | Consumes | Produces
 ## How to install
 to be written
 ## Actor system
-It might be not so useful but here is an idea of how all of API methods work work.
+It might be not so useful but here is an idea of how all of API methods work.
 ![Routes](https://raw.githubusercontent.com/shtykh/moovy/master/Routes.png)
