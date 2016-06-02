@@ -16,7 +16,7 @@ class StoreController(graph: ActorRef) extends Actor with ActorLogging {
     store
   }
 
-  var store: mutable.ParHashMap[Int, Movie] = initStore()
+  var store: mutable.ParHashMap[Int, Movie] = initStore() // TODO use persistent storage instead of map
 
   def returnToSender(id: Int, responder: ActorRef, value: Any): Unit = {
     get(id) match {
