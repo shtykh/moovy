@@ -1,6 +1,7 @@
 package shtykh.movie
 
 import akka.actor.ActorRef
+import shtykh.movie.calc.Distance
 
 sealed trait BaseMovieMessage {
   val receiver: ActorRef
@@ -15,10 +16,10 @@ case class GetRelevant(id: Int, amount: Int, receiver: ActorRef) extends BaseMov
 
 case class MovieNotFound(id: Int, receiver: ActorRef) extends BaseMovieMessage
 
-case class Distances(centerId: Int, distances: List[(Int, Int)], receiver: ActorRef) extends BaseMovieMessage
+case class Distances(centerId: Int, distances: scala.collection.mutable.Map[Int, Distance], receiver: ActorRef) extends BaseMovieMessage
 case class DistancesRequest(id: Int, receiver: ActorRef) extends BaseMovieMessage
 case class MovieMessage(movie: Movie, receiver: ActorRef) extends BaseMovieMessage
-case class CalculateRelevancy(movieId: Int, distance: Int, receiver: ActorRef) extends BaseMovieMessage
+case class CalculateRelevancy(movieId: Int, distance: Distance, receiver: ActorRef) extends BaseMovieMessage
 
 case class NotImplementedMessage(actor: String, message: Any)
 

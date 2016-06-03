@@ -13,6 +13,7 @@ class StoreController(graph: ActorRef) extends Actor with ActorLogging {
     store = new mutable.ParHashMap[Int, Movie]
     add(MovieInfo("Terminator", 12))
     add(MovieInfo("Terminator II", 120))
+    graph ! AddRelations(1, Set(2), self)
     store
   }
 

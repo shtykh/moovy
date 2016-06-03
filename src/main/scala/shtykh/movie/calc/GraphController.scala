@@ -24,8 +24,8 @@ class GraphController extends Actor with ActorLogging {
       receiver ! MovieProfile(movie, getNeighbors(movie.id))
     case m => sender ! NotImplementedMessage("graph", m)
   }
-  def countDistances(id: Int): List[(Int, Int)] = {
-    getNeighbors(id).map((_, 1)).toList // TODO implement dijkstra
+  def countDistances(id: Int): scala.collection.mutable.Map[Int, Distance] = {
+    new Dijkstra(graph).compute(id)
   }
   def addRelations(id: Int, set: Set[Int]) = {
     set.foreach(uuid => graph += (id ~ uuid))

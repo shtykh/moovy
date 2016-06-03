@@ -11,10 +11,14 @@ import scala.collection.mutable
  */
 class RelevantMovieFinder(amount: Int, graph: ActorRef, store: ActorRef, responder: ActorRef) extends Actor{
   val nrOfWorkers = 5 // todo
-  implicit val ordering = new MovieRelevancyReversedOrdering
+  implicit val ordering = new Ordering[MovieRelevancy]() {
+    override def compare(o1: MovieRelevancy, o2: MovieRelevancy): Int = (o2.relevance - o1.relevance).asInstanceOf[Int]
+  }
   val relevancies = new mutable.TreeSet[MovieRelevancy]
-  val workerRouter = 
-    context.actorOf(Props(new RelevancyCalculator(store)).withRouter(RoundRobinRouter(nrOfWorkers)), name = "workerRouter")
+  val calculators =
+    context.actorOf(
+      Props(new RelevancyCalculator(store)).withRouter(RoundRobinRouter(nrOfWorkers)), 
+      name = "workerRouter")
   var size = 0
 
   override def receive: Receive = {
@@ -22,10 +26,10 @@ class RelevantMovieFinder(amount: Int, graph: ActorRef, store: ActorRef, respond
       graph ! DistancesRequest(id, responder)
     case Distances(id, distances, responder) =>
       size = distances.size
-      if (size == 0) responder ! 
-        List.empty
+      if (size == 0) 
+        responder ! List.empty
       else distances.foreach{
-        case (movieId, distance) => workerRouter ! CalculateRelevancy(movieId, distance, self)
+        case (movieId, distance) => calculators ! CalculateRelevancy(movieId, distance, self)
       }
     case r : MovieRelevancy =>
       relevancies += r
